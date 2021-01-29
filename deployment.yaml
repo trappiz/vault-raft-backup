@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-raft-backup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/app: vault
+      app.kubernetes.io/function: backup
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/app: vault
+        app.kubernetes.io/function: backup
+    spec:
+      containers:
+      - image: trappis/vault-raft-backup:v0.1
+        name: vault-raft-backup
+        volumeMounts:
+        - name: vault-raft-backup-volume
+          mountPath: /etc/vault.d/
+      volumes:
+      - name: vault-raft-backup-volume
+        configMap:
+          name: vault-raft-backup-cm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-raft-backup-cm
+data:
+  snapshot.json: |
+    {
+       "addr":"http://vault-active.<namespace>.svc:8200",
+       "retain":30,
+       "frequency":"1h",
+       "role_id": "<vault-role-id>",
+       "secret_id":"<vault-secret-id>",
+       "aws_storage":{
+          "access_key_id":"<minio-user>",
+          "secret_access_key":"<minio-password>",
+          "s3_region":"<region>",
+          "s3_bucket":"<bucket-name>",
+          "s3_endpoint":"http://<minio-ip>:<minio-port",
+          "s3_force_path_style":true
+       }
+    }
