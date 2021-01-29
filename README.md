@@ -45,5 +45,5 @@ docker push <repo>/vault-raft-backup:v0.1
 Now edit the deployment.yaml to point to your internal repo and update the configmap from above.
 
 
-Creds to https://github.com/Lucretius for making this binary :)
+Creds to https://github.com/Lucretius for making the binary being used :)
 
